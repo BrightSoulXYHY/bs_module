@@ -60,8 +60,9 @@ def solve_plane_pt(plane_px_ptL,plane_real_ptL,cam_K):
     # 取重投影误差最小的
     data_dictL_dorted = sorted(data_dictL,key=lambda x: x["rpe"])
     data_dict = data_dictL_dorted[0]
-
+    
     # 重投影误差过大
     if data_dict["rpe"] < 10:
         result_dict = data_dict
+        result_dict["img_valid"] = True
     return result_dict
