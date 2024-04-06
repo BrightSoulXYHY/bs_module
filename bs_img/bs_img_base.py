@@ -19,9 +19,9 @@ def solve_plane_pt(plane_px_ptL,plane_real_ptL,cam_K):
     '''
     result_dict = {
         "rpe": np.nan,
-        "r_vec": [np.nan]*3,
-        "t_vec": [np.nan]*3,
-        "plane_px_calcL": [],
+        "r_vec": np.array([np.nan]*3),
+        "t_vec": np.array([np.nan]*3),
+        "plane_px_calcL": np.array([]),
         "img_valid": False,
     }
 
