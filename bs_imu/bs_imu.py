@@ -118,3 +118,17 @@ def quat_to_rpy(quat):
     pitch = np.arcsin(sy)
     yaw = np.arctan2(cysz, cycz)
     return roll, pitch, yaw
+
+
+
+
+def quat_multi_mat(quat, dir=1):
+    '''四元数的乘法矩阵，dir为方向1为左乘，-1为右乘'''
+    w, x, y, z = quat
+    v = np.array([x, y, z],dtype=float)
+    mat = np.zeros((4,4),dtype=float)
+    mat[0,0] = w
+    mat[0,1:] = -v
+    mat[1:,0] = v
+    mat[1:,1:] = w*np.identity(3,dtype=float) + dir*vec3d_to_ssmatrix(v)
+    return mat
