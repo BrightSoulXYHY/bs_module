@@ -40,7 +40,8 @@ def solve_plane_pt(plane_px_ptL,plane_real_ptL,cam_K):
             plane_px_ptL_sorted[i]
             for i in combineL
         ])
-        retval,r_vec,t_vec = cv2.solvePnP(plane_real_ptL, plane_px_calcL, cam_K, distCoeffs=None, flags=cv2.SOLVEPNP_EPNP)
+        # retval,r_vec,t_vec = cv2.solvePnP(plane_real_ptL, plane_px_calcL, cam_K, distCoeffs=None, flags=cv2.SOLVEPNP_EPNP)
+        retval,r_vec,t_vec = cv2.solvePnP(plane_real_ptL, plane_px_calcL, cam_K, distCoeffs=None, flags=cv2.SOLVEPNP_SQPNP)
         
         # 计算重投影误差
         reproj_errL = []
@@ -62,6 +63,6 @@ def solve_plane_pt(plane_px_ptL,plane_real_ptL,cam_K):
     data_dict = data_dictL_dorted[0]
 
     # 重投影误差过大
-    if data_dict["rpe"] < 10:
+    if data_dict["rpe"] < 50:
         result_dict = data_dict
     return result_dict
