@@ -59,7 +59,8 @@ def solve_drogue(gt_pts, camera_matrix, d_drogue):
     
     pts_num_drogue = len(gt_pts)
     if pts_num_drogue < 3:
-        return result_drogue  #特征点数目不足以拟合圆
+        return result_dict_drogue
+    #特征点数目不足以拟合圆
     data_dictL_drogue = []
     for num in range(4, max(4,pts_num_drogue)):
         data_dictL_drogue = []
@@ -68,9 +69,16 @@ def solve_drogue(gt_pts, camera_matrix, d_drogue):
                 gt_pts[i]
                 for i in combineL
             ])
-            result_drogue = solve_circle(drogue_px_calcL, camera_matrix, d_drogue)
+            rpe,r_vec,t_vec = solve_circle(drogue_px_calcL, camera_matrix, d_drogue)
+            result_drogue = {
+                "rpe":rpe,
+                "r_vec":r_vec,
+                "t_vec":t_vec,
+                "plane_px_calcL":drogue_px_calcL,
+                "img_valid":False,
+            }
             data_dictL_drogue.append(result_drogue)
-            print(result_drogue)
+
     # 取误差最小的
     data_dictL_drogue_sorted = sorted(data_dictL_drogue,key=lambda x: x[0])
     data_dict_drogue = data_dictL_drogue_sorted[0]
@@ -79,14 +87,4 @@ def solve_drogue(gt_pts, camera_matrix, d_drogue):
         result_dict_drogue["img_valid"] = True
     
     
-    rpe, r_vec, t_vec = solve_circle(gt_pts, camera_matrix, d_drogue)
-    if rpe < 10:
-        result_dict_drogue = {
-            "rpe": rpe,
-            "r_vec": r_vec,
-            "t_vec": t_vec,
-            "plane_px_calcL": gt_pts,
-            "img_valid": True, 
-        }
     return result_dict_drogue
-
