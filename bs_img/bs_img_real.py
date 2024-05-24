@@ -41,7 +41,7 @@ def solve_circle(pts,Intrinsics_matrix,d):
     r1 = abs(x11[0]-x21[0])/2
     t_vec = np.array([xc1*d/r1/2, yc1*d/r1/2, d/r1/2])
     r_vec = np.array([np.nan]*3)   #认定不结算姿态
-    rpe = circle_residuals(result.x, x_data, y_data)
+    rpe = np.linalg.norm(circle_residuals(result.x, x_data, y_data))
     
     return rpe, r_vec, t_vec
 
@@ -80,11 +80,11 @@ def solve_drogue(gt_pts, camera_matrix, d_drogue):
             data_dictL_drogue.append(result_drogue)
 
     # 取误差最小的
-    data_dictL_drogue_sorted = sorted(data_dictL_drogue,key=lambda x: x[0])
+    data_dictL_drogue_sorted = sorted(data_dictL_drogue,key=lambda x: x["rpe"])
     data_dict_drogue = data_dictL_drogue_sorted[0]
-    if data_dict_drogue["rpe"] < 10:
-        result_dict_drogue = data_dict_drogue
-        result_dict_drogue["img_valid"] = True
+    # if data_dict_drogue["rpe"] < 10:
+    result_dict_drogue = data_dict_drogue
+    result_dict_drogue["img_valid"] = True
     
     
     return result_dict_drogue
