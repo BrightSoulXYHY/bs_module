@@ -4,7 +4,6 @@ import scipy.optimize as opt
 from .bs_img_base import *
 
 def img_to_pts(img_bin, min_area = 15):
-    '''提取图片中的特征点'''
     # 连通域分析
     num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(img_bin, connectivity=4)
 
@@ -41,7 +40,7 @@ def solve_circle(pts,Intrinsics_matrix,d):
     r1 = abs(x11[0]-x21[0])/2
     t_vec = np.array([xc1*d/r1/2, yc1*d/r1/2, d/r1/2])
     r_vec = np.array([np.nan]*3)   #认定不结算姿态
-    rpe = np.linalg.norm(circle_residuals(result.x, x_data, y_data))
+    rpe = np.linalg.norm(circle_residuals(result.x, x_data, y_data))/len(x1)  #average
     
     return rpe, r_vec, t_vec
 
@@ -58,26 +57,28 @@ def solve_drogue(gt_pts, camera_matrix, d_drogue):
     }
     
     pts_num_drogue = len(gt_pts)
-    if pts_num_drogue < 3:
+    if pts_num_drogue < 5:
         return result_dict_drogue
     #特征点数目不足以拟合圆
     data_dictL_drogue = []
-    for num in range(4, max(4,pts_num_drogue)):
-        data_dictL_drogue = []
-        for combineL in itertools.combinations(range(pts_num_drogue), num):
-            drogue_px_calcL = np.array([
-                gt_pts[i]
-                for i in combineL
-            ])
-            rpe,r_vec,t_vec = solve_circle(drogue_px_calcL, camera_matrix, d_drogue)
-            result_drogue = {
-                "rpe":rpe,
-                "r_vec":r_vec,
-                "t_vec":t_vec,
-                "plane_px_calcL":drogue_px_calcL,
-                "img_valid":False,
-            }
-            data_dictL_drogue.append(result_drogue)
+    # for num in range(6,max(pts_num_drogue,6)):
+    num = 5
+        # data_dictL_drogue = []
+    for combineL in itertools.combinations(range(pts_num_drogue), num):
+        drogue_px_calcL = np.array([
+            gt_pts[i]
+            for i in combineL
+        ])
+        drogue_px_calcL = np.array(drogue_px_calcL)
+        rpe,r_vec,t_vec = solve_circle(drogue_px_calcL, camera_matrix, d_drogue)
+        result_drogue = {
+            "rpe":rpe,
+            "r_vec":r_vec,
+            "t_vec":t_vec,
+            "plane_px_calcL":drogue_px_calcL,
+            "img_valid":False,
+        }
+        data_dictL_drogue.append(result_drogue)
 
     # 取误差最小的
     data_dictL_drogue_sorted = sorted(data_dictL_drogue,key=lambda x: x["rpe"])
